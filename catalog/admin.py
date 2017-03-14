@@ -4,6 +4,7 @@ from .models import Author, Book, BookInstance, Genre
 
 
 class BooksInline(admin.TabularInline):
+    extra = 1
     model = Book
 
 @admin.register(Author)
@@ -14,6 +15,7 @@ class AuthorAdmin(admin.ModelAdmin):
 
 
 class BooksInstanceInline(admin.TabularInline):
+    extra = 1
     model = BookInstance
 
 @admin.register(Book)
