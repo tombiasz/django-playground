@@ -25,6 +25,14 @@ class Book(models.Model):
     def get_absolute_url(self):
         return reverse('book-detail', args=[str(self.id)])
 
+    def display_genre(self):
+        """
+        Return Genre as string. Required for admin list display.
+        """
+        limit = 3
+        return ', '.join((genre.name for genre in self.genre.all()[:limit]))
+    display_genre.short_description = 'Genre'
+
 
 class BookInstance(models.Model):
 
