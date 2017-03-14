@@ -13,5 +13,9 @@ class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'display_genre')
 
 
-admin.site.register(BookInstance)
+@admin.register(BookInstance)
+class BookInstanceAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(Genre)
