@@ -10,6 +10,8 @@ def index(request):
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
     num_authors = Author.objects.all().count()
     num_genries = Genre.objects.all().count()
+    num_visits = request.session.get('num_visits', 0)
+    request.session['num_visits'] = num_visits + 1
 
     return render(
         request,
@@ -20,6 +22,7 @@ def index(request):
             'num_instances_available': num_instances_available,
             'num_authors': num_authors,
             'num_genries': num_genries,
+            'num_visits': num_visits,
         },
     )
 
