@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^books/(?P<pk>\d+)$', views.BookDetailView.as_view(), name='book-detail'),
     url(r'^authors/$', views.AuthorListView.as_view(), name='author-list'),
     url(r'^authors/(?P<pk>\d+)$', views.AuthorDetailView.as_view(), name='author-detail'),
-    url(r'^mybooks/$', views.LoanedBooksByUserListView.as_view(), name='my-borrowed')
+    url(r'^mybooks/$', views.LoanedBooksByUserListView.as_view(), name='my-borrowed'),
+    url(r'^borrowed/$', views.LoanedBooksListView.as_view(), name='borrowed'),
 ]
