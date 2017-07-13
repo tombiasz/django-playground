@@ -106,3 +106,8 @@ class AuthorCreate(CreateView):
 class AuthorUpdate(UpdateView):
     model = Author
     fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+
+
+class AuthorDelete(DeleteView):
+    model = Author
+    success_url = reverse_lazy('author-list')
