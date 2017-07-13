@@ -101,3 +101,8 @@ class AuthorCreate(CreateView):
     model = Author
     fields = '__all__'
     initial = {'date_of_death': '12/10/2017',}
+
+
+class AuthorUpdate(UpdateView):
+    model = Author
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
