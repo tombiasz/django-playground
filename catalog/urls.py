@@ -17,4 +17,5 @@ urlpatterns = [
     url(r'^author/(?P<pk>\d+)/delete/$', views.AuthorDelete.as_view(), name='author_delete'),
 
     url(r'^book/create/$', views.BookCreate.as_view(), name='book-create'),
+    url(r'^book/(?P<pk>\d+)/update/$', views.BookUpdate.as_view(), name='book-update'),
 ]

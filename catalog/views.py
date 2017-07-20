@@ -115,3 +115,8 @@ class AuthorDelete(DeleteView):
 class BookCreate(CreateView):
     model = Book
     fields = '__all__'
+
+
+class BookUpdate(UpdateView):
+    model = Book
+    fields = '__all__'
