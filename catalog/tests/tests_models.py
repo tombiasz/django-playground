@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from catalog.models import Author
+from catalog.models import Author, Genre
 
 
 class AuthorModelTest(TestCase):
@@ -47,3 +47,30 @@ class AuthorModelTest(TestCase):
     def test_get_absolute_url(self):
         author = Author.objects.get(id=1)
         self.assertEqual(author.get_absolute_url(), '/catalog/authors/1')
+
+
+class GenreModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        Genre.objects.create(name="Poetry")
+
+    def test_name_label(self):
+        genre = Genre.objects.get(id=1)
+        field_label = genre._meta.get_field('name').verbose_name
+        self.assertEqual(field_label, 'name')
+
+    def test_name_field_hekp_text(self):
+        genre = Genre.objects.get(id=1)
+        field_label = genre._meta.get_field('name').help_text
+        self.assertEqual(field_label, "Enter a book genre (e.g. Science Fiction, French Poetry etc.)")
+
+    def test_name_max_length(self):
+        genre = Genre.objects.get(id=1)
+        max_length = genre._meta.get_field('name').max_length
+        self.assertEqual(max_length, 200)
+
+    def test_object_name_is_name(self):
+        genre = Genre.objects.get(id=1)
+        obj_name = '{}'.format(genre.name)
+        self.assertEqual(obj_name, genre.name)
