@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from catalog.models import Author, Genre
+from catalog.models import Author, Genre, Language
 
 
 class AuthorModelTest(TestCase):
@@ -74,3 +74,30 @@ class GenreModelTest(TestCase):
         genre = Genre.objects.get(id=1)
         obj_name = '{}'.format(genre.name)
         self.assertEqual(obj_name, genre.name)
+
+
+class LanguageModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        Language.objects.create(name="en")
+
+    def test_name_label(self):
+        lang = Language.objects.get(id=1)
+        field_label = lang._meta.get_field('name').verbose_name
+        self.assertEqual(field_label, 'name')
+
+    def test_name_field_hekp_text(self):
+        lang = Language.objects.get(id=1)
+        field_label = lang._meta.get_field('name').help_text
+        self.assertEqual(field_label, "Book's language")
+
+    def test_name_max_length(self):
+        lang = Language.objects.get(id=1)
+        max_length = lang._meta.get_field('name').max_length
+        self.assertEqual(max_length, 100)
+
+    def test_object_name_is_name(self):
+        lang = Language.objects.get(id=1)
+        obj_name = '{}'.format(lang.name)
+        self.assertEqual(obj_name, lang.name)
