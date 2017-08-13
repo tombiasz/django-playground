@@ -315,11 +315,15 @@ class BookInstanceModelTest(TestCase):
         self.book_instance.refresh_from_db()
         self.assertIsNone(self.book_instance.borrower)
 
-    def test_object_name_is_id_and_title(self):
+    def test_object_name_is_id_and_title_if_book_is_set(self):
         book = Book.objects.create(title="Book title")
         self.book_instance.book = book
         self.book_instance.save()
         obj_name = '{} ({})'.format(self.book_instance.id, self.book_instance.book.title)
+        self.assertEqual(obj_name, str(self.book_instance))
+
+    def test_object_name_is_id_if_book_is_null(self):
+        obj_name = '{}'.format(self.book_instance.id)
         self.assertEqual(obj_name, str(self.book_instance))
 
     def test_objects_are_ordered_by_due_date(self):

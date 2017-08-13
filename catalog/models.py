@@ -68,7 +68,9 @@ class BookInstance(models.Model):
         permissions = (('can_mark_returned', 'Set book as returned'),)
 
     def __str__(self):
-        return '%s (%s)' % (self.id, self.book.title)
+        if self.book:
+            return '{} ({})'.format(self.id, self.book.title)
+        return '{}'.format(self.id)
 
     @property
     def is_overdue(self):
