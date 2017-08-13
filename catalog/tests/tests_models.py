@@ -1,6 +1,10 @@
-from django.test import TestCase
+import datetime
+import uuid
 
-from catalog.models import Author, Genre, Language, Book
+from django.test import TestCase
+from django.contrib.auth.models import User
+
+from catalog.models import Author, Genre, Language, Book, BookInstance
 
 
 class AuthorModelTest(TestCase):
@@ -203,3 +207,147 @@ class BookModelTest(TestCase):
 
     def test_get_absolute_url(self):
         self.assertEqual(self.book.get_absolute_url(), '/catalog/books/1')
+
+
+class BookInstanceModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.book_instance = BookInstance.objects.create(imprint="imprint")
+
+    def setUp(self):
+        self.book_instance.refresh_from_db()
+
+    def test_id_label(self):
+        field_label = self.book_instance._meta.get_field('id').verbose_name
+        self.assertEqual(field_label, 'id')
+
+    def test_id_field_help_text(self):
+        field_label = self.book_instance._meta.get_field('id').help_text
+        self.assertEqual(field_label, "Unique ID for this particular book across whole library")
+
+    def test_id_field_is_primary_key(self):
+        self.assertEqual(self.book_instance.id, self.book_instance.pk)
+
+    def test_id_field_default_is_proper_uuid(self):
+        try:
+            uuid.UUID(str(self.book_instance.id), version=4)
+        except:
+            self.fail('id default value is not a proper UUID')
+
+    def test_book_label(self):
+        field_label = self.book_instance._meta.get_field('book').verbose_name
+        self.assertEqual(field_label, 'book')
+
+    def test_book_allow_null_value(self):
+        self.assertIsNone(self.book_instance.book)
+
+    def test_book_is_set_to_null_on_book_delte(self):
+        book = Book.objects.create(title="Book title")
+        self.book_instance.book = book
+        self.book_instance.save()
+        self.book_instance.refresh_from_db()
+        self.assertEqual(self.book_instance.book, book)
+        book.delete()
+        self.book_instance.refresh_from_db()
+        self.assertIsNone(self.book_instance.book)
+
+    def test_imprint_label(self):
+        field_label = self.book_instance._meta.get_field('imprint').verbose_name
+        self.assertEqual(field_label, 'imprint')
+
+    def test_imprint_max_length(self):
+        max_length = self.book_instance._meta.get_field('imprint').max_length
+        self.assertEqual(max_length, 200)
+
+    def test_due_back_label(self):
+        field_label = self.book_instance._meta.get_field('due_back').verbose_name
+        self.assertEqual(field_label, 'due back')
+
+    def test_due_back_allow_null_value(self):
+        self.assertIsNone(self.book_instance.due_back)
+
+    def test_due_back_can_be_blank(self):
+        can_be_blank = self.book_instance._meta.get_field('due_back').blank
+        self.assertTrue(can_be_blank)
+
+    def test_status_label(self):
+        field_label = self.book_instance._meta.get_field('status').verbose_name
+        self.assertEqual(field_label, 'status')
+
+    def test_status_max_length(self):
+        max_length = self.book_instance._meta.get_field('status').max_length
+        self.assertEqual(max_length, 1)
+
+    def test_status_field_help_text(self):
+        field_label = self.book_instance._meta.get_field('status').help_text
+        self.assertEqual(field_label, "Book availability")
+
+    def test_status_can_be_blank(self):
+        can_be_blank = self.book_instance._meta.get_field('status').blank
+        self.assertTrue(can_be_blank)
+
+    def test_status_field_default_is_to_maintaince(self):
+        self.assertEqual(self.book_instance.status, 'd')
+
+    def test_status_field_choices_is_set_to_loan_statuses(self):
+        choices = self.book_instance._meta.get_field('status').choices
+        self.assertEqual(choices, BookInstance.LOAN_STATUS)
+
+    def test_borrower_label(self):
+        field_label = self.book_instance._meta.get_field('borrower').verbose_name
+        self.assertEqual(field_label, 'borrower')
+
+    def test_borrower_can_be_blank(self):
+        can_be_blank = self.book_instance._meta.get_field('borrower').blank
+        self.assertTrue(can_be_blank)
+
+    def test_borrower_allow_null_value(self):
+        self.assertIsNone(self.book_instance.borrower)
+
+    def test_borrower_is_set_to_null_on_user_delte(self):
+        user = User.objects.create(username="test", password="test")
+        self.book_instance.borrower = user
+        self.book_instance.save()
+        self.book_instance.refresh_from_db()
+        self.assertEqual(self.book_instance.borrower, user)
+        user.delete()
+        self.book_instance.refresh_from_db()
+        self.assertIsNone(self.book_instance.borrower)
+
+    def test_object_name_is_id_and_title(self):
+        book = Book.objects.create(title="Book title")
+        self.book_instance.book = book
+        self.book_instance.save()
+        obj_name = '{} ({})'.format(self.book_instance.id, self.book_instance.book.title)
+        self.assertEqual(obj_name, str(self.book_instance))
+
+    def test_objects_are_ordered_by_due_date(self):
+        self.assertEqual(BookInstance._meta.ordering, ['due_back'])
+
+    def test_model_permissions(self):
+        expected = (('can_mark_returned', 'Set book as returned'),)
+        self.assertEqual(BookInstance._meta.permissions, expected)
+
+    def test_is_overdue_if_due_back_is_not_set(self):
+        self.assertFalse(self.book_instance.is_overdue)
+
+    def test_is_overdue_if_due_back_is_tomorrow(self):
+        today = datetime.date.today()
+        tomorrow = today + datetime.timedelta(days=1)
+        self.book_instance.due_back = tomorrow
+        self.book_instance.save()
+        self.assertFalse(self.book_instance.is_overdue)
+
+    def test_is_overdue_if_due_back_was_yesterday(self):
+        today = datetime.date.today()
+        yesterday = today + datetime.timedelta(days=-1)
+        self.book_instance.due_back = yesterday
+        self.book_instance.save()
+        self.assertTrue(self.book_instance.is_overdue)
+
+    def test_is_overdue_if_due_back_is_today(self):
+        today = datetime.date.today()
+        self.book_instance.due_back = today
+        self.book_instance.save()
+        self.assertFalse(self.book_instance.is_overdue)
