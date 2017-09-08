@@ -36,6 +36,38 @@ class AuthorListViewTest(TestCase):
         self.assertTrue(len(resp.context['author_list']) == 10)
 
 
+class AuthorDetailsViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.author = Author.objects.create(
+            first_name='Firstname',
+            last_name = 'Surname'
+        )
+
+    def test_view_url_returns_http_ok(self):
+        url = '/catalog/authors/{}'.format(self.author.pk)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_url_is_accessible_by_url_name(self):
+        url = reverse('author-detail', kwargs={ 'pk': self.author.pk})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        url = reverse('author-detail', kwargs={ 'pk': self.author.pk})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'catalog/author_detail.html')
+
+    def test_view_passes_author_in_context(self):
+        url = reverse('author-detail', kwargs={ 'pk': self.author.pk})
+        resp = self.client.get(url)
+        self.assertTrue('author' in resp.context)
+        self.assertEqual(resp.context['author'], self.author)
+
+
 class BookListViewTest(TestCase):
 
     @classmethod
