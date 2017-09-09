@@ -97,3 +97,34 @@ class BookListViewTest(TestCase):
         self.assertTrue('is_paginated' in resp.context)
         self.assertTrue(resp.context['is_paginated'] == True)
         self.assertTrue(len(resp.context['book_list']) == 10)
+
+
+class BookDetailsViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.book = Book.objects.create(
+            title = 'Title'
+        )
+
+    def test_view_url_returns_http_ok(self):
+        url = '/catalog/books/{}'.format(self.book.pk)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_url_is_accessible_by_url_name(self):
+        url = reverse('book-detail', kwargs={ 'pk': self.book.pk})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        url = reverse('book-detail', kwargs={ 'pk': self.book.pk})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'catalog/book_detail.html')
+
+    def test_view_passes_book_in_context(self):
+        url = reverse('book-detail', kwargs={ 'pk': self.book.pk})
+        resp = self.client.get(url)
+        self.assertTrue('book' in resp.context)
+        self.assertEqual(resp.context['book'], self.book)
