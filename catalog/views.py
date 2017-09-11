@@ -17,7 +17,9 @@ from .models import Author, Book, BookInstance, Genre
 def index(request):
     num_books = Book.objects.all().count()
     num_instances = BookInstance.objects.all().count()
-    num_instances_available = BookInstance.objects.filter(status__exact='a').count()
+    num_instances_available = BookInstance.objects.filter(
+                                status__exact=BookInstance.AVAILABLE_STATUS
+                              ).count()
     num_authors = Author.objects.all().count()
     num_genries = Genre.objects.all().count()
     num_visits = request.session.get('num_visits', 0)
@@ -63,7 +65,7 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         return BookInstance.objects \
                            .filter(borrower=self.request.user) \
-                           .filter(status__exact='o') \
+                           .filter(status__exact=BookInstance.ON_LOAN_STATUS) \
                            .order_by('due_back')
 
 class LoanedBooksListView(PermissionRequiredMixin, LoginRequiredMixin, generic.ListView):
@@ -74,7 +76,7 @@ class LoanedBooksListView(PermissionRequiredMixin, LoginRequiredMixin, generic.L
 
     def get_queryset(self):
         return BookInstance.objects \
-                           .filter(status__exact='o') \
+                           .filter(status__exact=BookInstance.ON_LOAN_STATUS) \
                            .order_by('due_back')
 
 

@@ -48,11 +48,15 @@ class Book(models.Model):
 
 class BookInstance(models.Model):
 
+    MAINTENANCE_STATUS = 'd'
+    ON_LOAN_STATUS = 'o'
+    AVAILABLE_STATUS = 'a'
+    RESERVED_STATUS = 'r'
     LOAN_STATUS = (
-        ('d', 'Maintenance'),
-        ('o', 'On loan'),
-        ('a', 'Available'),
-        ('r', 'Reserved'),
+        (MAINTENANCE_STATUS, 'Maintenance'),
+        (ON_LOAN_STATUS, 'On loan'),
+        (AVAILABLE_STATUS, 'Available'),
+        (RESERVED_STATUS, 'Reserved'),
     )
 
 
@@ -60,7 +64,7 @@ class BookInstance(models.Model):
     book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True)
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default='d', help_text='Book availability')
+    status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default=MAINTENANCE_STATUS, help_text='Book availability')
     borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
