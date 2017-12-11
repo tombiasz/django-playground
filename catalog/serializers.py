@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Genre, Language, Book, Author
+from .models import Genre, Language, Book, Author, BookInstance
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -29,4 +29,11 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         # fields = ('first_name', 'last_name', 'date_of_birth', 'date_of_death')
+        fields = '__all__'
+
+
+class BookInstanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BookInstance
         fields = '__all__'
