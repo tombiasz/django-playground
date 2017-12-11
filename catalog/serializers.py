@@ -7,28 +7,27 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('name',)
+        fields = '__all__'
 
 
 class LanguageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Language
-        fields = ('name',)
+        fields = '__all__'
 
 
 class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ('title', 'author', 'summary', 'isbn', 'genre', 'language' )
+        fields = '__all__'
 
 
 class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        # fields = ('first_name', 'last_name', 'date_of_birth', 'date_of_death')
         fields = '__all__'
 
 
